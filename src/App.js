@@ -28,9 +28,15 @@ const List = (props) => {
     )
 }
 
+const CheckInput = (props) => {
+    return(
+      <input value={props.searchInput} onChange={props.handleChange}/>
+    )
+}
+
 class Form extends React.Component{
     state = {
-      searchValue: ''
+      searchValue: '',
     }
     handleChange = (e) => {
       this.setState({searchValue: e.target.value})
@@ -40,6 +46,9 @@ class Form extends React.Component{
        const value = this.state.searchValue;
        this.setState({searchValue: ''});
        this.props.handleSubmit(value);
+    }
+    handleCheckInput = (e) => {
+        this.setState({searchInput: e.target.value})
     }
     render(){
       return(
@@ -53,7 +62,8 @@ class Form extends React.Component{
 class App extends React.Component{
     state={
         list:[],
-        value: ''
+        value: '',
+        searchInput: ''
     }
     handleSubmit = (value) => {
       const item = {
@@ -76,12 +86,19 @@ class App extends React.Component{
       const newList = this.state.list.filter(item => item.id !== el.id)
       this.setState({list: newList})
     }
+    handleChange = (e) => {
+        this.setState({searchInput: e.target.value})
+    }
     render() {
+        const filteredItems = this.state.list.filter(item => (
+          item.value.includes(this.state.searchInput)
+        ))
       return(
          <div>
              <h3>Input Info</h3>
              <Form handleSubmit={this.handleSubmit}/>
-             <List list={this.state.list}
+             <CheckInput handleChange={this.handleChange} />
+             <List list={filteredItems }
                  handleToggle={this.handleToggle}
                  handleRemove={this.handleRemove}
              />
