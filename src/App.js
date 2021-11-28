@@ -1,110 +1,48 @@
 import React from 'react';
 import './index.css';
 
-const Item = (props) => {
-    return(
-        <li>
-          {props.item.value}
-          <button onClick={() => props.handleToggle(props.item)}>Toggle</button>
-          <button onClick={() => props.handleRemove(props.item)}>Remove</button>
-        </li>
+const Counter = (props) => {
+    return (
+      <>
+        {props.counters.map(item => {
+            const {id, counter} = item
+            return (
+            <div key={id}>
+              <h4>{counter}</h4>
+              <button onClick={() => props.handleClick(id)}>increment</button>
+            </div>
+          )
+        })}
+      </>
     )
-}
-
-const List = (props) => {
-    return(
-       <ul>
-           {props.list.map((item) => {
-             return(
-               <Item
-                  key={item.id}
-                  item={item}
-                  handleToggle={props.handleToggle}
-                  handleRemove={props.handleRemove}
-                />
-               )
-           })}
-       </ul>
-    )
-}
-
-const CheckInput = (props) => {
-    return(
-      <input value={props.searchInput} onChange={props.handleChange}/>
-    )
-}
-
-class Form extends React.Component{
-    state = {
-      searchValue: '',
-    }
-    handleChange = (e) => {
-      this.setState({searchValue: e.target.value})
-    }
-    handleSubmit = (e) => {
-       e.preventDefault();
-       const value = this.state.searchValue;
-       this.setState({searchValue: ''});
-       this.props.handleSubmit(value);
-    }
-    handleCheckInput = (e) => {
-        this.setState({searchInput: e.target.value})
-    }
-    render(){
-      return(
-        <form onSubmit={this.handleSubmit}>
-         <input value={this.state.searchValue} onChange={this.handleChange} />
-        </form>
-  )
-    }
 }
 
 class App extends React.Component{
     state={
-        list:[],
-        value: '',
-        searchInput: ''
+        counters: [
+            {id: 1, counter: 5, increment: 5},
+            {id: 2, counter: 10, increment: 3},
+            {id: 3, counter: 17, increment: 7},
+            {id: 4, counter: 20}
+        ]
     }
-    handleSubmit = (value) => {
-      const item = {
-          value,
-          id: Math.floor(Math.random() * 45)
-      }
-      const newList = [...this.state.list, item]
-      this.setState({list: newList})
-    }
-    handleToggle = (el) => {
-       const newList = this.state.list.map(item => {
-           if(item.id === el.id) {
-               console.log('handle toggle')
-           }
-           return item
+    handleClick = (id) => {
+       const newList = this.state.counters.map(item => {
+          if(item.id === id) {
+              item.counter += item.increment || 1;
+          }
+          return item
        })
-       this.setState({list: newList})
-    }
-    handleRemove = (el) => {
-      const newList = this.state.list.filter(item => item.id !== el.id)
-      this.setState({list: newList})
-    }
-    handleChange = (e) => {
-        this.setState({searchInput: e.target.value})
+       this.setState({counters: newList})
     }
     render() {
-        const filteredItems = this.state.list.filter(item => (
-          item.value.includes(this.state.searchInput)
-        ))
-      return(
-         <div>
-             <h3>Input Info</h3>
-             <Form handleSubmit={this.handleSubmit}/>
-             <CheckInput handleChange={this.handleChange} />
-             <List list={filteredItems }
-                 handleToggle={this.handleToggle}
-                 handleRemove={this.handleRemove}
-             />
-         </div>
-      )
-  }
+        return(
+           <div>
+               <h3>Counter App</h3>
+               <Counter handleClick={this.handleClick} counters={this.state.counters}/>
+           </div>
+        )
+    }
 }
 
 export default App
