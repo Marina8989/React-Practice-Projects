@@ -2,10 +2,37 @@ import React from 'react';
 import './index.css';
 import axios from 'axios'
 
-const Item = (props) => {
-    return(
-        <li>{props.item.value}</li>
+class Item extends React.Component {
+    state={
+        updatedValue: this.props.item.value,
+        visible: false
+    }
+    handleClick = () => {
+        this.setState({visible: true})
+    }
+    handleChange = (e) => {
+       this.setState({updatedValue: e.target.value})
+    }
+    handleResubmit = (e) => {
+      e.preventDefault();
+      this.props.handleResubmit(this.props.item, this.state.updatedValue);
+      this.setState({updatedValue: this.state.updatedValue, visible: false})
+    }
+    render(){
+     return(
+        <li>
+            <div onClick={this.handleClick}>
+                {this.state.visible ? (
+                    <form onSubmit={this.handleResubmit}>
+                        <input value={this.state.updatedValue} onChange={this.handleChange} />
+                    </form>
+                ) : (
+                    this.props.item.value
+                )}
+            </div>
+        </li>
     )
+    }
 }
 
 const List = (props) => {
@@ -13,7 +40,7 @@ const List = (props) => {
        <ul>
            {props.list.map(item => (
                <div key={item.id}>
-                   <Item item={item} />
+                   <Item item={item} handleResubmit={props.handleResubmit}/>
                </div>
            ))}
        </ul>
@@ -52,11 +79,20 @@ class App extends React.Component{
       const newList = [...this.state.list, item]
       this.setState({list: newList})
     }
+    handleResubmit = (item, value) => {
+        const newList = this.state.list.map((element) => {
+            if(element.id === item.id) {
+               element.value = value
+            }
+            return element
+        })
+        this.setState({list: newList})
+    }
     render(){
         return(
         <div>
             <Form handleSubmit={this.handleSubmit} />
-            <List list={this.state.list} />
+            <List list={this.state.list} handleResubmit={this.handleResubmit}/>
         </div>
         )
     }
