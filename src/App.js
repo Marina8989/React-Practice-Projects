@@ -2,46 +2,61 @@ import React from 'react';
 import './index.css';
 import axios from 'axios'
 
-class App extends React.Component{
-    state={
-        list: [],
-        inputValue: ''
-    }
-     getPageInfo = async (user) => {
-         try{
-            const {data} = await axios(`https://api.github.com/users/${user}`);
-            const newList = [...this.state.list, data];
-            this.setState({list: newList})
-         }catch(err) {
-            console.log(err)
-         }
-     }
-      handleChange = (e) => {
-         this.setState({inputValue: e.target.value})
-      }
+const Item = (props) => {
+    return(
+        <li>{props.item.value}</li>
+    )
+}
 
-      handleSubmit = (e) => {
-         e.preventDefault();
-         this.getPageInfo(this.state.inputValue);
-         this.setState({inputValue: ''});
-      }
-
-
-    render(){
-        console.log(this.state.list)
-        return(
-        <div>
-           <form onSubmit={this.handleSubmit}>
-               <input value={this.state.inputValue} onChange={this.handleChange} />
-           </form>
-           <>
-           {this.state.list.map(item => (
+const List = (props) => {
+    return(
+       <ul>
+           {props.list.map(item => (
                <div key={item.id}>
-                 <h3>{item.login}</h3>
-                 <img src={item.avatar_url} />
+                   <Item item={item} />
                </div>
            ))}
-           </>
+       </ul>
+    )
+}
+class Form extends React.Component{
+    state={
+        inputValue: ''
+    }
+    handleChange = (e) => {
+      this.setState({inputValue: e.target.value})
+    }
+    handleSubmit = (e) => {
+       e.preventDefault();
+       const value = this.state.inputValue;
+       this.setState({inputValue: ''});
+       this.props.handleSubmit(value)
+    }
+    render(){
+        return(
+            <form onSubmit={this.handleSubmit}>
+                <input value={this.state.inputValue} onChange={this.handleChange}/>
+            </form>
+        )
+    }
+}
+class App extends React.Component{
+    state={
+        list: []
+    }
+    handleSubmit = (value) => {
+      const item = {
+          value,
+          id: Math.floor(Math.random() * 45)
+      }
+      const newList = [...this.state.list, item]
+      this.setState({list: newList})
+    }
+    render(){
+        return(
+        <div>
+            <Form handleSubmit={this.handleSubmit} />
+            <List list={this.state.list} />
         </div>
         )
     }
